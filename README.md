@@ -7,7 +7,7 @@ A simple web-based terminal built with Flask. This terminal allows users to exec
 - **Security Measures**: Uses subprocess to securely handle commands.
 
 ## Screenshots
-![WebTerminal](https://media.discordapp.net/attachments/956358578241945620/1296009771752624199/image.png)
+![WebTerminal](img/image.png)
 
 ## Setup
 
