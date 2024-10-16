@@ -96,9 +96,20 @@ html_template = """
         </div>
     </div>
     <script>
+        let commandHistory = [];
+        let historyIndex = -1;
+
         document.getElementById('command-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            var command = document.getElementById('command-input').value;
+            const commandInput = document.getElementById('command-input');
+            const command = commandInput.value;
+
+            // Add command to history if not empty
+            if (command) {
+                commandHistory.push(command);
+                historyIndex = commandHistory.length; // Reset index to the end
+            }
+
             fetch('/', {
                 method: 'POST',
                 headers: {
@@ -108,12 +119,44 @@ html_template = """
             })
             .then(response => response.text())
             .then(html => {
-                var parser = new DOMParser();
-                var doc = parser.parseFromString(html, 'text/html');
-                var newOutput = doc.getElementById('output').innerHTML; // Get updated output
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newOutput = doc.getElementById('output').innerHTML; // Get updated output
                 document.getElementById('output').innerHTML = newOutput; // Update only the output div
-                document.getElementById('command-input').value = ''; // Clear the input field
+                commandInput.value = ''; // Clear the input field
             });
+        });
+
+        // Handle arrow key navigation in command history
+        document.getElementById('command-input').addEventListener('keydown', function(e) {
+            const commandInput = this;
+
+            if (e.key === 'ArrowUp') {
+                e.preventDefault(); // Prevent default behavior
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    commandInput.value = commandHistory[historyIndex];
+                    setTimeout(() => {
+                        commandInput.setSelectionRange(commandInput.value.length, commandInput.value.length); // Set cursor at end
+                    }, 0);
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault(); // Prevent default behavior
+                if (historyIndex < commandHistory.length - 1) {
+                    historyIndex++;
+                    commandInput.value = commandHistory[historyIndex];
+                    setTimeout(() => {
+                        commandInput.setSelectionRange(commandInput.value.length, commandInput.value.length); // Set cursor at end
+                    }, 0);
+                } else {
+                    // If at the end of the history, clear the input
+                    historyIndex++;
+                    commandInput.value = '';
+                    setTimeout(() => {
+                        commandInput.setSelectionRange(0, 0); // Set cursor at start
+                    }, 0);
+                }
+            }
         });
     </script>
 </body>
@@ -143,4 +186,4 @@ def terminal():
     return render_template_string(html_template, output=output)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=19506)
+    app.run(host='0.0.0.0', port=5000) # default port: 5000
