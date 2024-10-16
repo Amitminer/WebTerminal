@@ -30,7 +30,7 @@ Ensure you have the following installed:
 
 3. Run the application:
     ```bash
-    python app.py
+    python terminal.py
     ```
 
 4. Access the WebTerminal in your browser:
